@@ -32,11 +32,8 @@ class WaypointUpdater(object):
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
-        # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint
-        # below
-
-        self.final_waypoints_pub = rospy.Publisher(
-            'final_waypoints', Lane, queue_size=1)
+        # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
+        self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
 
@@ -108,8 +105,7 @@ class WaypointUpdater(object):
         pass
 
     def obstacle_cb(self, msg):
-        # TODO: Callback for /obstacle_waypoint message. We will implement it
-        # later
+        # TODO: Callback for /obstacle_waypoint message. We will implement it later
         pass
 
     def get_waypoint_velocity(self, waypoint):
@@ -120,11 +116,9 @@ class WaypointUpdater(object):
 
     def distance(self, waypoints, wp1, wp2):
         dist = 0
-        dl = lambda a, b: math.sqrt(
-            (a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2)
+        dl = lambda a, b: math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2)
         for i in range(wp1, wp2 + 1):
-            dist += dl(waypoints[wp1].pose.pose.position,
-                       waypoints[i].pose.pose.position)
+            dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
             wp1 = i
         return dist
 
