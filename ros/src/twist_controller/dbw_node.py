@@ -33,9 +33,7 @@ that we have created in the `__init__` function.
 
 '''
 
-
 class DBWNode(object):
-
     def __init__(self):
         rospy.init_node('dbw_node')
 
@@ -80,7 +78,7 @@ class DBWNode(object):
         self.loop()
 
     def loop(self):
-        rate = rospy.Rate(50)  # 50Hz
+        rate = rospy.Rate(50) # 50Hz
         while not rospy.is_shutdown():
             # TODO: Get predicted throttle, brake, and steering using `twist_controller`
             # You should only publish the control commands if dbw is enabled
