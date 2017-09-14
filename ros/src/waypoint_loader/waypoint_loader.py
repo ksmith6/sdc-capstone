@@ -14,7 +14,6 @@ import rospy
 CSV_HEADER = ['x', 'y', 'z', 'yaw']
 MAX_DECEL = 1.0
 
-
 class WaypointLoader(object):
 
     def __init__(self):
@@ -72,7 +71,7 @@ class WaypointLoader(object):
         return waypoints
 
     def publish(self, waypoints):
-        rate = rospy.Rate(40)
+        rate = rospy.Rate(5) #40Hz
         while not rospy.is_shutdown():
             lane = Lane()
             lane.header.frame_id = '/world'
@@ -80,7 +79,6 @@ class WaypointLoader(object):
             lane.waypoints = waypoints
             self.pub.publish(lane)
             rate.sleep()
-
 
 if __name__ == '__main__':
     try:
