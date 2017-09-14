@@ -43,7 +43,7 @@ class Controller(object):
 	brake = BRAKE_MAX*min(0.0, pid_throttle_output)
 
 	#Steer uses provided yaw controller
-	#angular_velocity = self.lowpass_angle.filter(angular_velocity)
+	#angular_velocity = self.lowpass_angle.filt(angular_velocity)
 	steer = self.yaw_controller.get_steering(linear_velocity, angular_velocity, current_linear)
 	#Calculate lateral cross track error for steering control
 	#vector = [way_points[1][0] - way_points[0][0], way_points[1][1] - way_points[0][1]]
@@ -53,6 +53,6 @@ class Controller(object):
 	#steer = max( min( steer + pid_steer_output, self.max_angle), -self.max_angle)
 
 	#Apply low pass filter to smooth out steering
-	steer = self.lowpass_steer.filter(steer)
+	steer = self.lowpass_steer.filt(steer)
 	# Return throttle, brake, steer
 	return throttle, brake, steer
