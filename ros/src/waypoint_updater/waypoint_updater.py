@@ -38,13 +38,66 @@ class WaypointUpdater(object):
 
         # TODO: Add other member variables you need below
 
+        self.base_waypoints = None
         rospy.spin()
 
     def pose_cb(self, msg):
+
+        rospy.logwarn("Pose CB: (%s, %s, %s)",
+                      msg.pose.position.x,
+                      msg.pose.position.y,
+                      msg.pose.position.z)
+
         # TODO: Implement
-        pass
+        if self.base_waypoints == None:
+            return
+
+        current_pose = msg.pose
+        current_base_waypoints = self.base_waypoints
+
+        final_waypoints_msg = Lane()
+        final_waypoints_msg.header.stamp = rospy.Time.now()
+
+        start_idx = self.closest_waypoint(current_pose.position)
+        size_of_waypoints = len(self.base_waypoints)
+        final_proposed_waypoints = []
+        if ((start_idx + LOOKAHEAD_WPS) <= size_of_waypoints):
+            final_proposed_waypoints = current_base_waypoints[
+                start_idx: start_idx + LOOKAHEAD_WPS]
+            rospy.logwarn("Publish waypoints final from [%s, %s)",
+                          start_idx,
+                          start_idx + LOOKAHEAD_WPS)
+        else:
+            final_proposed_waypoints = current_base__waypoints[start_idx : size_of_waypoints] + \
+                current_base__waypoints[
+                    0: (start_idx + LOOKAHEAD_WPS) - size_of_waypoints]
+            rospy.logwarn("Publish waypoints final modulo with start idx [%s, %s) and [0, %s)",
+                          start_idx,
+                          size_of_waypoints,
+                          ((start_idx + LOOKAHEAD_WPS) - size_of_waypoints))
+
+        final_waypoints_msg.waypoints = final_proposed_waypoints
+        for i in range(len(final_waypoints_msg.waypoints)):
+            final_waypoints_msg.waypoints[i].twist.twist.linear.x = 10
+
+            # Test - Remove afterwards - Send
+            rospy.logwarn("Updater Publish Waypoint CB: (%s, %s, %s)",
+                          final_waypoints_msg.waypoints[
+                              0].pose.pose.position.x,
+                          final_waypoints_msg.waypoints[
+                              0].pose.pose.position.y,
+                          final_waypoints_msg.waypoints[0].pose.pose.position.z)
+
+        self.final_waypoints_pub.publish(final_waypoints_msg)
 
     def waypoints_cb(self, waypoints):
+        rospy.logwarn("Waypoint CB: (%s, %s, %s)",
+                      waypoints.waypoints[0].pose.pose.position.x,
+                      waypoints.waypoints[0].pose.pose.position.y,
+                      waypoints.waypoints[0].pose.pose.position.z)
+        rospy.logwarn("Number of Waypoints are (%s)",
+                      len(waypoints.waypoints))
+        self.base_waypoints = waypoints.waypoints
         # TODO: Implement
         pass
 
@@ -64,11 +117,29 @@ class WaypointUpdater(object):
 
     def distance(self, waypoints, wp1, wp2):
         dist = 0
-        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2  + (a.z-b.z)**2)
+        dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2 + (a.z-b.z)**2)
         for i in range(wp1, wp2+1):
             dist += dl(waypoints[wp1].pose.pose.position, waypoints[i].pose.pose.position)
             wp1 = i
         return dist
+
+    def distance_between_points(self, a, b):
+        dist = math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2 + (a.z - b.z)**2)
+        return dist
+
+    def closest_waypoint(self, position):
+        closest_idx = 0
+        min_dist = 99999
+
+        for idx, wp in enumerate(self.base_waypoints):
+            dist = self.distance_between_points(
+                position, wp.pose.pose.position)
+
+            if dist < min_dist:
+                closest_idx = idx
+                min_dist = dist
+
+        return closest_idx
 
 
 if __name__ == '__main__':

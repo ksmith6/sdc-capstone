@@ -4,6 +4,8 @@ import rospy
 from std_msgs.msg import Bool
 from dbw_mkz_msgs.msg import ThrottleCmd, SteeringCmd, BrakeCmd, SteeringReport
 from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import PoseStamped
+from styx_msgs.msg import Lane, Waypoint
 import math
 
 from twist_controller import Controller
@@ -53,10 +55,25 @@ class DBWNode(object):
         self.brake_pub = rospy.Publisher('/vehicle/brake_cmd',
                                          BrakeCmd, queue_size=1)
 
+        #self.drive_by_wire_enabled = False
+        self.current_velocity = None
+        self.current_pose = None
+        self.final_waypoints = None
+        self.previous_loop_time = rospy.get_rostime()
+
         # TODO: Create `TwistController` object
         # self.controller = TwistController(<Arguments you wish to provide>)
 
         # TODO: Subscribe to all the topics you need to
+        rospy.Subscriber('/current_pose', PoseStamped, self.current_pose_cb)
+        rospy.Subscriber('/final_waypoints', Lane,
+                         self.final_waypoints_cb)
+        rospy.Subscriber('/twist_cmd', TwistStamped,
+                         self.twist_commands_cb)
+        rospy.Subscriber('/current_velocity', TwistStamped,
+                         self.current_velocity_cb)
+        rospy.Subscriber('/vehicle/dbw_enabled', Bool,
+                         self.drive_by_wire_enabled_cb)
 
         self.loop()
 
@@ -91,6 +108,27 @@ class DBWNode(object):
         bcmd.pedal_cmd_type = BrakeCmd.CMD_TORQUE
         bcmd.pedal_cmd = brake
         self.brake_pub.publish(bcmd)
+
+    def twist_commands_cb(self, msg):
+        self.twist_command = msg.twist
+
+    def drive_by_wire_enabled_cb(self, msg):
+        self.drive_by_wire_enable = bool(msg.data)
+        # if self.is_drive_by_wire_enable is True:
+
+    def current_velocity_cb(self, msg):
+        self.current_velocity = msg.twist
+
+    def current_pose_cb(self, msg):
+        self.current_pose = msg.pose
+
+    def final_waypoints_cb(self, msg):
+        self.final_waypoints = msg.waypoints
+        # Test - Remove afterwards - Receive
+        rospy.logwarn("DBW Receive Waypoint CB: (%s, %s, %s)",
+                      self.final_waypoints[0].pose.pose.position.x,
+                      self.final_waypoints[0].pose.pose.position.y,
+                      self.final_waypoints[0].pose.pose.position.z)
 
 
 if __name__ == '__main__':
