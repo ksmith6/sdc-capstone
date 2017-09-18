@@ -38,7 +38,7 @@ class WaypointLoader(object):
         return tf.transformations.quaternion_from_euler(0., 0., yaw)
 
     def get_velocity(self, velocity):
-        return velocity/3.6
+        return velocity / 3.6
 
     def load_waypoints(self, fname):
         waypoints = []
@@ -51,20 +51,21 @@ class WaypointLoader(object):
                 p.pose.pose.position.z = float(wp['z'])
                 q = self.quaternion_from_yaw(float(wp['yaw']))
                 p.pose.pose.orientation = Quaternion(*q)
-                p.twist.twist.linear.x = float(self.velocity*0.27778)
+                p.twist.twist.linear.x = float(self.velocity * 0.27778)
 
                 waypoints.append(p)
         return self.decelerate(waypoints)
 
     def distance(self, p1, p2):
         x, y, z = p1.x - p2.x, p1.y - p2.y, p1.z - p2.z
-        return math.sqrt(x*x + y*y + z*z)
+        return math.sqrt(x * x + y * y + z * z)
 
     def decelerate(self, waypoints):
         last = waypoints[-1]
         last.twist.twist.linear.x = 0.
         for wp in waypoints[:-1][::-1]:
-            dist = self.distance(wp.pose.pose.position, last.pose.pose.position)
+            dist = self.distance(wp.pose.pose.position,
+                                 last.pose.pose.position)
             vel = math.sqrt(2 * MAX_DECEL * dist) * 3.6
             if vel < 1.:
                 vel = 0.
@@ -72,7 +73,7 @@ class WaypointLoader(object):
         return waypoints
 
     def publish(self, waypoints):
-        rate = rospy.Rate(40)
+        rate = rospy.Rate(5)
         while not rospy.is_shutdown():
             lane = Lane()
             lane.header.frame_id = '/world'
