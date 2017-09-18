@@ -97,11 +97,9 @@ class DBWNode(object):
             self.reset()
 
     def pose_cb(self, msg):
-        pass
         self.pose = [msg.pose.position.x, msg.pose.position.y]
 
     def waypoints_cb(self, msg):
-        pass
         self.final_waypoints = [[msg.waypoints[0].pose.pose.position.x, msg.waypoints[0].pose.pose.position.y], [
             msg.waypoints[5].pose.pose.position.x, msg.waypoints[5].pose.pose.position.y]]
 

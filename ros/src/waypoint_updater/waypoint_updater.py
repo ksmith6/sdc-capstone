@@ -63,7 +63,6 @@ class WaypointUpdater(object):
         #              msg.pose.position.y,
         #              msg.pose.position.z)
 
-        # TODO: Implement
         if self.base_waypoints == None:
             return
 
