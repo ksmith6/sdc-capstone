@@ -35,7 +35,7 @@ class Controller(object):
 		return 0.0, 0.0, 0.0
 
 	#Calculate CTE for throttle
-	linear_velocity = 4.47 # This will keep the car at 10 MPH. To remove once a controller can handle higher speeds
+	#linear_velocity = 4.47 # This will keep the car at 10 MPH. To remove once a controller can handle higher speeds
 	cte = linear_velocity - current_linear 
 	pid_throttle_output = self.pid_throttle.step(cte, time_elapsed)
 	#Throttle and brake should not be used at the same time. TO DO: Brake may require separate (or additional) controller
