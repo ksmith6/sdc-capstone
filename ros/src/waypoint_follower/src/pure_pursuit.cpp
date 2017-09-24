@@ -32,7 +32,7 @@
 
 
 //constexpr int LOOP_RATE = 30; //processing frequency
-constexpr int LOOP_RATE = 5; //processing frequency
+constexpr int LOOP_RATE = 30; //processing frequency
 constexpr int PUB_SUB_QUEUE_SIZE = 1; //max queue size
 
 int main(int argc, char **argv)
