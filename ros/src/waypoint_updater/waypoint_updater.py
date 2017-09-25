@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, TwistStamped
 from styx_msgs.msg import Lane, Waypoint, TrafficLightArray, TrafficLight
 
 import math
@@ -24,7 +24,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-SLOW_DIST = 6. # (in meters) Distance from closest traffic light must be for car to start slowing down
+SLOW_DIST = 20. # (in meters) Distance from closest traffic light must be for car to start slowing down
 STOP_DIST = 2. # (in meters) Distance from closest traffic light to decide whether to top or go through intersection
 RED = 0
 
@@ -38,10 +38,13 @@ class WaypointUpdater(object):
 		self.tl_waypoints = None
 		self.tl_waypoint_index = None
 		self.tl_state = None
+		self.map_tl_waypoint = {}
 
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
 		rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
-		sub = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_light_cb, queue_size=1)
+
+		rospy.Subscriber('/current_velocity', TwistStamped, callback=self.current_velocity_cb, queue_size=1)
+		rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_light_cb, queue_size=1)
 
 		self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
@@ -58,6 +61,9 @@ class WaypointUpdater(object):
 		# Temp Callback for /tl_waypoint message. To remove
 		self.tl_waypoints = msg.lights
 
+	def current_velocity_cb(self, msg):
+		self.current_velocity = msg.twist.linear.x
+
 	def traffic_cb(self, msg):
         # TODO: Callback for /tl_waypoint message. Implement
 		pass
@@ -70,10 +76,11 @@ class WaypointUpdater(object):
 	def loop(self):
 		rate = rospy.Rate(5)
 		while not rospy.is_shutdown():
-			if self.base_waypoints and self.current_pose and self.tl_waypoints:
+			if self.base_waypoints and self.current_pose and self.tl_waypoints and self.current_velocity:				
 				start_idx = self.closest_waypoint(self.current_pose.position)
 				# If this waypoint behind the current pose then update to next waypoint
 				self.next_waypoint_index = self.ahead_waypoint(self.current_pose.position, start_idx)
+				self.map_tl_wp()
 				self.closest_tl()
 				self.publish()
 			rate.sleep()
@@ -96,16 +103,30 @@ class WaypointUpdater(object):
 	def set_final_waypoints_speed(self):
 		dist = self.distance(self.base_waypoints, self.next_waypoint_index, self.tl_waypoint_index)
 		rospy.logwarn("Next wp: %s, Next TL wp: %s, distance: %s",self.next_waypoint_index, self.tl_waypoint_index, dist)
-		if dist <= STOP_DIST and self.tl_state is RED: speed = 0.0
-		elif dist <= SLOW_DIST and dist > STOP_DIST: speed = 2.2
-		else: speed = 4.47 
-		for wp in self.final_waypoints: wp.twist.twist.linear.x = speed
+		if dist <= STOP_DIST and self.tl_state is RED: 
+			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 0.0) #Decelerate to a stop
+		elif dist <= SLOW_DIST and dist > STOP_DIST: 
+			target_speed = 1.5 #A cautious speed
+			margin = 2
+			if self.current_velocity < target_speed:
+				for wp in self.final_waypoints: self.set_waypoint_velocity(wp, target_speed) #Accelelerate to target speed
+			else:
+				slope = (self.current_velocity - target_speed) / (dist - STOP_DIST)
+				for idx, wp in enumerate(self.final_waypoints): 
+					if self.next_waypoint_index + idx >= self.tl_waypoint_index: continue
+					dist2 = self.distance(self.base_waypoints, self.next_waypoint_index + idx, self.tl_waypoint_index) - STOP_DIST - margin
+					speed = slope*dist2 + target_speed if dist2 > 0.0 else target_speed
+					self.set_waypoint_velocity(wp, speed)
+			#for wp in self.final_waypoints: self.set_waypoint_velocity(wp, target_speed) #Accelelerate to top speed
+		else: 
+			#for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 4.47) #Accelelerate to top speed
+			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 5.0) #Accelelerate to top speed
 
 	def get_waypoint_velocity(self, waypoint):
 		return waypoint.twist.twist.linear.x
 
-	def set_waypoint_velocity(self, waypoints, waypoint, velocity):
-		waypoints[waypoint].twist.twist.linear.x = velocity
+	def set_waypoint_velocity(self, waypoint, velocity):
+		waypoint.twist.twist.linear.x = velocity
 
 	def distance(self, waypoints, wp1, wp2):
 		dist, wp3 = 0.0, -1
@@ -151,16 +172,17 @@ class WaypointUpdater(object):
 		self.ahead_waypoint_index = ahead_idx
 		return ahead_idx
 
+	def map_tl_wp(self):
+		if self.map_tl_waypoint: pass
+		for idx in xrange(len(self.tl_waypoints)): self.map_tl_waypoint[idx] = self.closest_waypoint(self.tl_waypoints[idx].pose.pose.position)
+
 	def closest_tl(self):
-		closest_idx = min(xrange(len(self.tl_waypoints)), key = lambda p: self.distance_between_points(self.tl_waypoints[p].pose.pose.position, self.current_pose.position))
-		next_idx = (closest_idx+1)%len(self.tl_waypoints)
-		p1 = self.tl_waypoints[closest_idx].pose.pose.position
-		p2 = self.tl_waypoints[next_idx].pose.pose.position
-		angle = math.atan2(p2.y-p1.y,p2.x-p1.x)
-		x,y = self.current_pose.position.x, self.current_pose.position.y
-		localize_x = (x - p1.x) * math.cos(angle) + (y - p1.y) * math.sin(angle)
-		if localize_x > 0.0: closest_idx = next_idx
-		self.tl_waypoint_index = self.closest_waypoint(self.tl_waypoints[closest_idx].pose.pose.position) - 32 #estimated offset
+		closest_idx = min(
+			xrange(len(self.tl_waypoints)), 
+			key = lambda p: self.distance(self.base_waypoints, self.next_waypoint_index, self.map_tl_waypoint[p])
+		)
+		if self.map_tl_waypoint[closest_idx] - self.next_waypoint_index < 32: closest_idx = closest_idx + 1
+		self.tl_waypoint_index = self.map_tl_waypoint[closest_idx] - 32
 		self.tl_state = self.tl_waypoints[closest_idx].state
 
 if __name__ == '__main__':

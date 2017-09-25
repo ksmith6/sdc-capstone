@@ -46,6 +46,6 @@ class Controller(object):
 	def set_controllers(self):
 		#PID Controllers for throttle and brake
 		self.pid_throttle = PID(0.42,0.0,0.0,0.0,1.0)
-		self.pid_brake = PID(0.42,0.0,0.0,0.0,1.0)
+		self.pid_brake = PID(0.3,0.0,0.0,0.0,1.0)
 		#Low pass filter to smooth out the steering
 		self.lowpass_steer = LowPassFilter(0.3,1.0)
