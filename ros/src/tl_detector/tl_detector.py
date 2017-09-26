@@ -23,7 +23,7 @@ class TLDetector(object):
 		self.camera_image = None
 		self.lights = []
 		self.slps = []
-		self.stop_line_positions = []
+
 		sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
 		self.waypoints = rospy.wait_for_message('/base_waypoints', Lane).waypoints # Only need to get base_waypoints once
 		'''
@@ -45,7 +45,6 @@ class TLDetector(object):
 			tl = TrafficLight()
 			tl.pose.pose.position.x, tl.pose.pose.position.y, tl.pose.pose.position.z = slp[0], slp[1], 0
 			self.slps.append( self.get_closest_waypoint(tl.pose.pose.position) )
-			self.stop_line_positions.append( tl )
 
 		sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
 
@@ -193,9 +192,10 @@ class TLDetector(object):
 			func = lambda p: self.slps[p]-car_position if self.slps[p] >= car_position else len(self.waypoints) + self.slps[p]-car_position
 			idx = min(xrange(len(self.slps)), key = func)
 			light_wp = self.slps[idx]
-			light = self.stop_line_positions[idx]
+			#light = self.stop_line_positions[idx]
+			light = self.lights[idx]
 		if light:
-			state = self.lights[idx].state #Remove once traffic light classifier is implemented
+			state = light.state #Remove once traffic light classifier is implemented
 			#state = self.get_light_state(light)
 			return light_wp, state
 		self.waypoints = None
