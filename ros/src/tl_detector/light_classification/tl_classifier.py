@@ -2,10 +2,18 @@ from styx_msgs.msg import TrafficLight
 import cv2
 from keras.models import load_model
 from numpy import zeros, newaxis
+import rospkg
 
 class TLClassifier(object):
     def __init__(self):
-        model = load_model('test_1.h5')
+        
+        
+	ros_root = rospkg.get_ros_root()
+
+	r = rospkg.RosPack()
+	path = r.get_path('tl_detector')
+	print(path)
+        model = load_model(path + '/model.h5') 
         print(model)
         pass
 
