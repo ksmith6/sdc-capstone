@@ -1,4 +1,3 @@
-from styx_msgs.msg import TrafficLight
 import cv2
 from keras.models import load_model
 from numpy import zeros, newaxis
