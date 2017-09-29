@@ -27,6 +27,7 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
+        imrs = cv2.resize(image, (400, 400)) 
         imrs = imrs.astype(float)
     	imrs = imrs / 255.0
 
