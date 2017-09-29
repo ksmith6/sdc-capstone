@@ -13,8 +13,8 @@ class TLClassifier(object):
 	r = rospkg.RosPack()
 	path = r.get_path('tl_detector')
 	print(path)
-        model = load_model(path + '/model.h5') 
-        print(model)
+        self.model = load_model(path + '/model.h5') 
+        #print(model)
         pass
 
     def get_classification(self, image):
@@ -32,12 +32,12 @@ class TLClassifier(object):
     	imrs = imrs / 255.0
 
     	imrs = imrs[newaxis,:,:,:]
-        print(imrs)
-    	preds = model.predict(imrs)
-    	print('Predicted:' ,preds)
+        #print(imrs)
+    	preds = self.model.predict(imrs)
+    	#print('Predicted:' ,preds)
     	predicted_class = np.argmax(preds, axis=1)
 
-    	print('Predicted C:' ,predicted_class)
+    	print('Predicted Class:' ,predicted_class)
     	lid = predicted_class[0]
 
         if(lid == 1):

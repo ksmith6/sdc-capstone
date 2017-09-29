@@ -82,6 +82,7 @@ class TLDetector(object):
 		self.camera_image = msg
 		if not self.lights or not self.waypoints or not self.pose: pass
 		light_wp, state = self.process_traffic_lights()
+                rospy.logwarn("Light wp: %s,  Light state %s",light_wp, state)
 
 		'''
 		Publish upcoming red lights at camera frequency.
@@ -184,6 +185,9 @@ class TLDetector(object):
 
 		"""
 		light = None
+                if (self.waypoints is None):
+                        return -1, TrafficLight.UNKNOWN
+                
 		if(self.pose):
 			car_position = self.get_closest_waypoint(self.pose.pose.position)
 
@@ -196,7 +200,7 @@ class TLDetector(object):
 			light = self.lights[idx]
 		if light:
 			state = light.state #Remove once traffic light classifier is implemented
-			#state = self.get_light_state(light)
+			state = self.get_light_state(light)
 			return light_wp, state
 		self.waypoints = None
 		return -1, TrafficLight.UNKNOWN
