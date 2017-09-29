@@ -4,7 +4,7 @@ from keras.models import load_model
 from numpy import zeros, newaxis
 import rospkg
 import numpy as np
-
+import tensorflow as tf 
 class TLClassifier(object):
     def __init__(self):
         
@@ -15,6 +15,9 @@ class TLClassifier(object):
 	path = r.get_path('tl_detector')
 	print(path)
         self.model = load_model(path + '/model.h5') 
+
+	self.model._make_predict_function()
+        self.graph = tf.get_default_graph()
         #print(model)
         pass
 
@@ -34,7 +37,8 @@ class TLClassifier(object):
 
     	imrs = imrs[newaxis,:,:,:]
         #print(imrs)
-    	preds = self.model.predict(imrs)
+	with self.graph.as_default():
+            preds = self.model.predict(imrs)
     	#print('Predicted:' ,preds)
     	predicted_class = np.argmax(preds, axis=1)
 
