@@ -3,6 +3,7 @@ import cv2
 from keras.models import load_model
 from numpy import zeros, newaxis
 import rospkg
+import numpy as np
 
 class TLClassifier(object):
     def __init__(self):
