@@ -166,7 +166,20 @@ class TLDetector(object):
 			self.prev_light_loc = None
 			return False
 
-		cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+		#cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+		
+		if(not self.has_image):
+            		self.prev_light_loc = None
+            		return TrafficLight.RED
+
+        # fixing convoluted camera encoding...
+		if hasattr(self.camera_image, 'encoding'):
+		    self.attribute = self.camera_image.encoding
+		    if self.camera_image.encoding == '8UC3':
+			self.camera_image.encoding = "rgb8"
+		else:
+		    self.camera_image.encoding = 'rgb8'
+		cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
 
 		x, y = self.project_to_image_plane(light.pose.pose.position)
 
