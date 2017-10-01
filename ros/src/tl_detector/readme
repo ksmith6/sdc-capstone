@@ -67,7 +67,8 @@ After design the model, we trained the collected data and augmentated with flip,
 Finally, we got the model model.h5.
 
 2. For the real world data, we followed 2.5 Tensorflow Model: Object Detection API of John Chen's work.
-We use the best checkpoint 1911 as the finally model.
+https://github.com/diyjac/SDC-System-Integration/tree/master/classifier
+Indeed, We use the best checkpoint 1911 as the finally model.
 
 The model can be download from https://drive.google.com/open?id=0B8PSf2JS7ts2VDNSWmI1MVZRSDQ
 
