@@ -42,9 +42,7 @@ class TLClassifierOB(object):
             self.tf_graph = tf.Graph()
             with self.tf_graph.as_default():
                 od_graph_def = tf.GraphDef()
-                print('start here 1')
                 with tf.gfile.GFile(path+'/frozen_inference_graph.pb', 'rb') as fid:
-                    print('read GFile')
                     serialized_graph = fid.read()
                     od_graph_def.ParseFromString(serialized_graph)
                     tf.import_graph_def(od_graph_def, name='')
@@ -57,7 +55,6 @@ class TLClassifierOB(object):
                     self.detection_classes = self.tf_graph.get_tensor_by_name('detection_classes:0')
                     self.num_detections = self.tf_graph.get_tensor_by_name('num_detections:0')
                     self.predict = True
-                    print('Maybed not read frozen inference graph')
 
         predict = TrafficLight.UNKNOWN
         if self.predict is not None:

@@ -25,6 +25,7 @@ class TLDetector(object):
 		self.lights = []
 		self.slps = []
 
+              
 		sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
 		self.waypoints = rospy.wait_for_message('/base_waypoints', Lane).waypoints # Only need to get base_waypoints once
 		'''
@@ -41,6 +42,8 @@ class TLDetector(object):
 		config_string = rospy.get_param("/traffic_light_config")
 		self.config = yaml.load(config_string)
 
+                self.model_type = rospy.get_param("model_type")
+
 		# List of positions that correspond to the line to stop in front of a given intersection. Convert to more appropriate format
 		for slp in self.config['stop_line_positions']:
 			tl = TrafficLight()
@@ -52,7 +55,8 @@ class TLDetector(object):
 		self.upcoming_red_light_pub = rospy.Publisher('/traffic_waypoint', Int32, queue_size=1)
 
 		self.bridge = CvBridge()
-                if True:
+                if self.model_type == "CNN" :
+                    print('Launching CNN based Object Detection')    
 		    self.light_classifier = TLClassifier()
                 else:
                     self.light_classifier = TLClassifierOB()
