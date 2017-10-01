@@ -94,7 +94,7 @@ class WaypointUpdater(object):
 			pass
 
 		dist = self.distance(self.base_waypoints, self.next_waypoint_index, self.light_wp)
-		rospy.logwarn("Next wp: %s, Next TL wp: %s, distance: %s",self.next_waypoint_index, self.light_wp, dist)
+		#rospy.logwarn("Next wp: %s, Next TL wp: %s, distance: %s",self.next_waypoint_index, self.light_wp, dist)
 		if dist <= STOP_DIST: 
 			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 0.0) #Decelerate to a stop
 		else: 
