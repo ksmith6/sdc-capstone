@@ -42,7 +42,7 @@ class TLClassifier(object):
     	#print('Predicted:' ,preds)
     	predicted_class = np.argmax(preds, axis=1)
 
-    	print('Predicted Class:' ,predicted_class)
+    	print('Predicted Class:' ,predicted_class[0])
     	lid = predicted_class[0]
 
         if(lid == 1):

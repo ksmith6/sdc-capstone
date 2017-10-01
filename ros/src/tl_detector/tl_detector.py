@@ -165,8 +165,9 @@ class TLDetector(object):
 		if(not self.has_image):
 			self.prev_light_loc = None
 			return False
+                cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
 
-		cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+		#cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
 		x, y = self.project_to_image_plane(light.pose.pose.position)
 
@@ -202,7 +203,7 @@ class TLDetector(object):
 			state = light.state #Remove once traffic light classifier is implemented
 			state = self.get_light_state(light)
 			return light_wp, state
-		self.waypoints = None
+		#self.waypoints = None
 		return -1, TrafficLight.UNKNOWN
 
 if __name__ == '__main__':
