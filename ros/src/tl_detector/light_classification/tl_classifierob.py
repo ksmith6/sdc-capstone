@@ -42,7 +42,9 @@ class TLClassifierOB(object):
             self.tf_graph = tf.Graph()
             with self.tf_graph.as_default():
                 od_graph_def = tf.GraphDef()
+                print('start here 1')
                 with tf.gfile.GFile(path+'/frozen_inference_graph.pb', 'rb') as fid:
+                    print('read GFile')
                     serialized_graph = fid.read()
                     od_graph_def.ParseFromString(serialized_graph)
                     tf.import_graph_def(od_graph_def, name='')
@@ -55,6 +57,7 @@ class TLClassifierOB(object):
                     self.detection_classes = self.tf_graph.get_tensor_by_name('detection_classes:0')
                     self.num_detections = self.tf_graph.get_tensor_by_name('num_detections:0')
                     self.predict = True
+                    print('Maybed not read frozen inference graph')
 
         predict = TrafficLight.UNKNOWN
         if self.predict is not None:
@@ -62,6 +65,7 @@ class TLClassifierOB(object):
             image_np_expanded = np.expand_dims(image_np, axis=0)
 
             # Actual detection
+            
             (scores, classes, num) = self.tf_session.run(
                 [self.detection_scores, self.detection_classes, self.num_detections],
                 feed_dict={self.image_tensor: image_np_expanded})
@@ -75,6 +79,9 @@ class TLClassifierOB(object):
             predict = self.clabels[c]
             cc = classes[0]
             confidence = scores[0]
+            print('cc:', cc)
+            print('confidence:', confidence)
+            print('predict is:', predict)
             if cc > 0 and cc < 4 and confidence is not None and confidence > THRESHOLD:
                 c = cc
                 predict = self.clabels[c]
