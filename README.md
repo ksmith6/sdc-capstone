@@ -26,9 +26,63 @@ To detect the closest traffic light, we utilized the config file provided by Uda
 
 The next step was to train a model to classify the image received from /camera/image_raw. We used a CNN-based model for classification. Below are the specs for this model:
 
-Layer (type)                 Output Shape              Param #    ================================================================= conv2d_1 (Conv2D)            (None, 398, 398, 32)      896        _________________________________________________________________ activation_1 (Activation)    (None, 398, 398, 32)      0          _________________________________________________________________ conv2d_2 (Conv2D)            (None, 396, 396, 32)      9248       _________________________________________________________________ activation_2 (Activation)    (None, 396, 396, 32)      0          _________________________________________________________________ max_pooling2d_1 (MaxPooling2 (None, 198, 198, 32)      0          _________________________________________________________________ conv2d_3 (Conv2D)            (None, 196, 196, 32)      9248       _________________________________________________________________ activation_3 (Activation)    (None, 196, 196, 32)      0          _________________________________________________________________ max_pooling2d_2 (MaxPooling2 (None, 98, 98, 32)        0          _________________________________________________________________ conv2d_4 (Conv2D)            (None, 96, 96, 32)        9248       _________________________________________________________________ activation_4 (Activation)    (None, 96, 96, 32)        0          _________________________________________________________________ max_pooling2d_3 (MaxPooling2 (None, 48, 48, 32)        0          _________________________________________________________________ conv2d_5 (Conv2D)            (None, 46, 46, 32)        9248       _________________________________________________________________ activation_5 (Activation)    (None, 46, 46, 32)        0          _________________________________________________________________ max_pooling2d_4 (MaxPooling2 (None, 23, 23, 32)        0          _________________________________________________________________ conv2d_6 (Conv2D)            (None, 21, 21, 32)        9248       _________________________________________________________________ activation_6 (Activation)    (None, 21, 21, 32)        0          _________________________________________________________________ max_pooling2d_5 (MaxPooling2 (None, 10, 10, 32)        0          _________________________________________________________________ conv2d_7 (Conv2D)            (None, 8, 8, 32)          9248       _________________________________________________________________ activation_7 (Activation)    (None, 8, 8, 32)          0          _________________________________________________________________ max_pooling2d_6 (MaxPooling2 (None, 4, 4, 32)          0          _________________________________________________________________ dropout_1 (Dropout)          (None, 4, 4, 32)          0          _________________________________________________________________ flatten_1 (Flatten)          (None, 512)               0          _________________________________________________________________ dense_1 (Dense)              (None, 128)               65664      _________________________________________________________________ activation_8 (Activation)    (None, 128)               0          _________________________________________________________________ dropout_2 (Dropout)          (None, 128)               0          _________________________________________________________________ dense_2 (Dense)              (None, 2)                 258        _________________________________________________________________ activation_9 (Activation)    (None, 2)                 0          =================================================================
- 
 
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv2d_1 (Conv2D)            (None, 398, 398, 32)      896       
+_________________________________________________________________
+activation_1 (Activation)    (None, 398, 398, 32)      0         
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 396, 396, 32)      9248      
+_________________________________________________________________
+activation_2 (Activation)    (None, 396, 396, 32)      0         
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 198, 198, 32)      0         
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 196, 196, 32)      9248      
+_________________________________________________________________
+activation_3 (Activation)    (None, 196, 196, 32)      0         
+_________________________________________________________________
+max_pooling2d_2 (MaxPooling2 (None, 98, 98, 32)        0         
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 96, 96, 32)        9248      
+_________________________________________________________________
+activation_4 (Activation)    (None, 96, 96, 32)        0         
+_________________________________________________________________
+max_pooling2d_3 (MaxPooling2 (None, 48, 48, 32)        0         
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 46, 46, 32)        9248      
+_________________________________________________________________
+activation_5 (Activation)    (None, 46, 46, 32)        0         
+_________________________________________________________________
+max_pooling2d_4 (MaxPooling2 (None, 23, 23, 32)        0         
+_________________________________________________________________
+conv2d_6 (Conv2D)            (None, 21, 21, 32)        9248      
+_________________________________________________________________
+activation_6 (Activation)    (None, 21, 21, 32)        0         
+_________________________________________________________________
+max_pooling2d_5 (MaxPooling2 (None, 10, 10, 32)        0         
+_________________________________________________________________
+conv2d_7 (Conv2D)            (None, 8, 8, 32)          9248      
+_________________________________________________________________
+activation_7 (Activation)    (None, 8, 8, 32)          0         
+_________________________________________________________________
+max_pooling2d_6 (MaxPooling2 (None, 4, 4, 32)          0         
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 4, 4, 32)          0         
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 512)               0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 128)               65664     
+_________________________________________________________________
+activation_8 (Activation)    (None, 128)               0         
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 128)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 2)                 258       
+_________________________________________________________________
+activation_9 (Activation)    (None, 2)                 0         
+=================================================================
 We trained our model on images taken from the simulator, which we manually labeled as “red” and “not red”. We also implemented code to zoom in on the image of the traffic light. This helped get rid of extraneous data in the images and allowed the classifier to focus on the traffic lights. We also applied image augmentation techniques to help our classifier adapt to a larger variety of images it may encounter. These techniques included flipping images and shifting the images horizontally/vertically to create more data. This process can be found in /ros/src/tl_detector/train.py. 
 
 We eventually ended up with the model weights (/ros/src/tl_detector/model.h5) and were able to test our program to predict traffic lights. For testing on real world model data, we followed 2.5 Tensorflow Model: Object Detection API of John Chen's work. https://github.com/diyjac/SDC-System-Integration/tree/master/classifier We use the best checkpoint 1911 as the finally model.
