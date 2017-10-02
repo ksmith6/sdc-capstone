@@ -84,7 +84,7 @@ dense_2 (Dense)              (None, 2)                 258
 _________________________________________________________________
 activation_9 (Activation)    (None, 2)                 0         
 =================================================================
-We trained our model on images taken from the simulator, which we manually labeled as “red” and “not red”. We also implemented code to zoom in on the image of the traffic light. This helped get rid of extraneous data in the images and allowed the classifier to focus on the traffic lights. We also applied image augmentation techniques to help our classifier adapt to a larger variety of images it may encounter. These techniques included flipping images and shifting the images horizontally/vertically to create more data. This process can be found in /ros/src/tl_detector/train.py. 
+We trained our model on images taken from the simulator, which we manually labeled as “red” and “not red”. We also implemented code to zoom in on the image of the traffic light. This helped get rid of extraneous data in the images and allowed the classifier to focus on the traffic lights. We also applied image augmentation techniques to help our classifier adapt to a larger variety of images it may encounter. These techniques included flipping, zoom and shifting the images horizontally/vertically to create more data. This process can be found in /ros/src/tl_detector/train.py. 
 
 We eventually ended up with the model weights (/ros/src/tl_detector/model.h5) and were able to test our program to predict traffic lights.
 
