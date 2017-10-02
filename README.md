@@ -17,11 +17,16 @@
 @Apik 
 
 ## Drive-By-Wire (DBW)
-The `dbw_node.py` logic will call the Controller object with the current state information (speed, etc) to obtain throttle, brake, and steering commands.
 
-If DBW is enabled, then the values for throttle, braking, and steering are published.
+### `dbw_node.py`
 
-If DBW becomes disabled, then all values are reset.
+The `dbw_node.py` logic will call the `Controller` object with the current state information (speed, etc) to obtain throttle, brake, and steering commands.
+
+If drive-by-wire (DBW) flag is enabled, then the `Controller` computed values for throttle, braking, and steering are published to `/vehicle/throttle_cmd`, `/vehicle/braking_cmd`, and `/vehicle/steering_cmd` respectively.
+
+The `Controller` logic resides within the `twist_controller.py` file.  This file leverages the `PID.py` file to control the throttle and brake commands.  Additionally, the steering commands are generated based on commands from `yaw_controller.py` and are smoothed via a low-pass filter from `lowpass.py` to remove jitter from the commanded steering angle.
+
+If the DBW flag becomes disabled (manual control), then all control values are reset.  This is critical for clearing out the running integral error term for a PID controller.
 
 ## Conclusions
 @Apik
