@@ -120,9 +120,17 @@ class WaypointUpdater(object):
 		no_red_light_detected = self.light_wp < 0
 		if no_red_light_detected:
 			# Set all waypoint velocities to MAX SPEED.
-			for wp in self.final_waypoints: 
-				self.set_waypoint_velocity(wp, MAX_SPEED) #Accelelerate to top speed
-		        return
+			#for wp in self.final_waypoints: 
+			#	self.set_waypoint_velocity(wp, MAX_SPEED) #Accelelerate to top speed
+		    #    return
+
+		    speed = self.current_velocity
+			if speed < MAX_SPEED:
+				rospy.logwarn("Accelerating to top speed again...")
+			for wp in self.final_waypoints:
+				speed = min(MAX_SPEED, speed+ACCEL)
+				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
+			return
 
         # Otherwise, a red light was detected.
 
