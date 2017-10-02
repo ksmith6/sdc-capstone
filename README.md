@@ -28,7 +28,7 @@ The next step was to train a model to classify the image received from /camera/i
 
 
 Layer (type)                 Output Shape              Param #   
-=================================================================
+
 conv2d_1 (Conv2D)            (None, 398, 398, 32)      896       
 _________________________________________________________________
 activation_1 (Activation)    (None, 398, 398, 32)      0         
