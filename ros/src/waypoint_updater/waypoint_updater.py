@@ -42,7 +42,7 @@ class WaypointUpdater(object):
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
 		#rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
 		self.base_waypoints = rospy.wait_for_message('/base_waypoints', Lane).waypoints #Only need to get base_waypoints once
-		#rospy.Subscriber('/current_velocity', TwistStamped, callback=self.current_velocity_cb, queue_size=1)
+		rospy.Subscriber('/current_velocity', TwistStamped, callback=self.current_velocity_cb, queue_size=1)
 		rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb, queue_size=1)
 
 		self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
