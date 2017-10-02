@@ -16,8 +16,12 @@
 ## Traffic Light Detection
 @Apik 
 
-## Drive-By-Wire
-@Kelly
+## Drive-By-Wire (DBW)
+The `dbw_node.py` logic will call the Controller object with the current state information (speed, etc) to obtain throttle, brake, and steering commands.
+
+If DBW is enabled, then the values for throttle, braking, and steering are published.
+
+If DBW becomes disabled, then all values are reset.
 
 ## Conclusions
 @Apik
