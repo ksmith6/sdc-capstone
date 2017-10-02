@@ -7,6 +7,7 @@ from std_msgs.msg import Int32
 
 import math
 import tf
+from copy import deepcopy
 from scipy.interpolate import CubicSpline
 
 '''
@@ -36,10 +37,10 @@ class WaypointUpdater(object):
 		self.current_pose = None
 		self.next_waypoint_index = None
 		self.light_wp = None
+		self.top_speed = None
 
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
-		#rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
-		self.base_waypoints = rospy.wait_for_message('/base_waypoints', Lane).waypoints #Only need to get base_waypoints once
+		self.wp_sub = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
 		#rospy.Subscriber('/current_velocity', TwistStamped, callback=self.current_velocity_cb, queue_size=1)
 		rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb, queue_size=1)
 
@@ -53,6 +54,10 @@ class WaypointUpdater(object):
 	
 	def waypoints_cb(self, waypoints):
 		self.base_waypoints = waypoints.waypoints
+		if self.base_waypoints:
+			self.wp_sub.unregister()
+			self.wp_sub = None
+			self.top_speed = self.get_waypoint_velocity(self.base_waypoints[0]) #Get velocity from waypoint_loader
 
 	def current_velocity_cb(self, msg):
 		self.current_velocity = msg.twist.linear.x
@@ -84,21 +89,21 @@ class WaypointUpdater(object):
 		self.final_waypoints_pub.publish(final_waypoints_msg)
 
 	def set_final_waypoints(self):
-		self.final_waypoints = self.base_waypoints[self.next_waypoint_index: self.next_waypoint_index + LOOKAHEAD_WPS]
+		self.final_waypoints = deepcopy(self.base_waypoints[self.next_waypoint_index: self.next_waypoint_index + LOOKAHEAD_WPS])
 		rem_points = LOOKAHEAD_WPS - len(self.final_waypoints)
-		if rem_points > 0: self.final_waypoints = self.final_waypoints + self.base_waypoints[0:rem_points]
+		if rem_points > 0: self.final_waypoints = self.final_waypoints + deepcopy(self.base_waypoints[0:rem_points])
 		
 	def set_final_waypoints_speed(self):
 		if self.light_wp < 0:
-			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 4.47) #Accelelerate to top speed
+			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, self.top_speed) #Accelelerate to top speed
 		        return
 
 		dist = self.distance(self.base_waypoints, self.next_waypoint_index, self.light_wp)
 		rospy.logwarn("Next wp: %s, Next TL wp: %s, distance: %s",self.next_waypoint_index, self.light_wp, dist)
-		if dist <= STOP_DIST: 
+		if dist <= STOP_DIST:
 			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 0.0) #Decelerate to a stop
 		else: 
-			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 4.47) #Accelelerate to top speed
+			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, self.top_speed) #Accelelerate to top speed
 			
 	def get_waypoint_velocity(self, waypoint):
 		return waypoint.twist.twist.linear.x
