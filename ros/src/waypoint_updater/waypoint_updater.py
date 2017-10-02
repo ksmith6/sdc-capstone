@@ -26,7 +26,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 
 LOOKAHEAD_WPS = 50 # 200 # Number of waypoints we will publish. You can change this number
 SLOW_DIST = 20. # (in meters) Distance from closest traffic light must be for car to start slowing down
-STOP_DIST = 4. # (in meters) Distance from closest traffic light to decide whether to top or go through intersection
+STOP_DIST = 10. # (in meters) Distance from closest traffic light to decide whether to top or go through intersection
 
 class WaypointUpdater(object):
 	def __init__(self):

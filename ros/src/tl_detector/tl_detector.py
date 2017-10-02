@@ -13,7 +13,7 @@ import cv2
 import yaml
 
 import math
-STATE_COUNT_THRESHOLD = 3
+STATE_COUNT_THRESHOLD = 2
 
 class TLDetector(object):
 	def __init__(self):
@@ -24,7 +24,7 @@ class TLDetector(object):
 		self.camera_image = None
 		self.lights = []
 		self.slps = []
-
+                self.listener = None
               
 		sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
 		self.waypoints = rospy.wait_for_message('/base_waypoints', Lane).waypoints # Only need to get base_waypoints once
@@ -61,6 +61,7 @@ class TLDetector(object):
                 else:
                     self.light_classifier = TLClassifierOB()
 
+                    
 		self.listener = tf.TransformListener()
 
 		self.state = TrafficLight.UNKNOWN
@@ -187,7 +188,8 @@ class TLDetector(object):
 		    self.camera_image.encoding = 'rgb8'
 		cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
 
-		x, y = self.project_to_image_plane(light.pose.pose.position)
+                if (self.listener is not None):
+		        x, y = self.project_to_image_plane(light.pose.pose.position)
 
 		#TODO use light location to zoom in on traffic light in image
 
