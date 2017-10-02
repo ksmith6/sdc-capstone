@@ -11,7 +11,13 @@
 @Apik
 
 ## Waypoint Updater
-@Kelly
+Upon initialization, the Waypoint Updater will receive a copy of the base waypoints, and it will cache it internally.  
+
+At each 5Hz cycle of the waypoint updater code, it publishes the final waypoints (50) and their speeds to the `/final_waypoints` topic.
+
+The speed at each waypoint is determined by whether or not a red light has been detected or not.  If a red light has been detected and the vehicle is within the braking distance (4 meters), then it will set all waypoint velocities to zero to stop the vehicle.
+
+If no red traffic light has been detected, then the waypoint updater will command all final waypoints to drive at the maximum speed (10 mph). 
 
 ## Traffic Light Detection
 @Apik 
