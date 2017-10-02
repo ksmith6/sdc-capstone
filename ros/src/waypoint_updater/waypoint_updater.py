@@ -28,7 +28,7 @@ LOOKAHEAD_WPS = 50 # 200 # Number of waypoints we will publish. You can change t
 STOP_DIST = 4. # (in meters) Distance from closest traffic light to decide whether to top or go through intersection
 MAX_SPEED = 4.47# meters/second = 10 mph
 SLOW_DIST = MAX_SPEED*2 # (in meters) Distance from closest traffic light must be for car to start slowing down
-ACCEL = 0.05 # Velocity increment (m/s) to be applied at each waypoint 
+ACCEL = 1.0 # Velocity increment (m/s) to be applied at each waypoint 
 
 class WaypointUpdater(object):
 	def __init__(self):
@@ -123,8 +123,7 @@ class WaypointUpdater(object):
 			#for wp in self.final_waypoints: 
 			#	self.set_waypoint_velocity(wp, MAX_SPEED) #Accelelerate to top speed
 		    #    return
-
-		    speed = self.current_velocity
+			speed = self.current_velocity
 
 			if speed < MAX_SPEED:
 				rospy.loginfo("Accelerating to top speed again...")

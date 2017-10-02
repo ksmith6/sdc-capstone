@@ -125,9 +125,9 @@ class DBWNode(object):
 				#if throttle > 0.0 or (self.decel < self.brake_deadband and self.current_linear > 0.5): brake = 0.0
 				else: brake = self.brake_max_torque*brake
 				
-				rospy.logwarn('linear: %s, current: %s', self.linear_velocity, self.current_linear)
-				rospy.logwarn('angular: %s, decel: %s, time: %s', self.angular_velocity, self.decel, self.previous_time)
-				rospy.logwarn('throttle: %s, brake: %s, steer: %s', throttle, brake, steer)
+				rospy.loginfo('linear: %s, current: %s', self.linear_velocity, self.current_linear)
+				rospy.loginfo('angular: %s, decel: %s, time: %s', self.angular_velocity, self.decel, self.previous_time)
+				rospy.loginfo('throttle: %s, brake: %s, steer: %s', throttle, brake, steer)
 				self.publish(throttle, brake, steer)
 			else: self.reset()
 			rate.sleep()
