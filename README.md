@@ -20,11 +20,11 @@ The speed at each waypoint is determined by whether or not a red light has been 
 If no red traffic light has been detected, then the waypoint updater will command all final waypoints to drive at the maximum speed (10 mph). 
 
 ## Traffic Light Detection
-Our approach to traffic light detection consisted of two parts: Detecting the traffic closest traffic light ahead, and then classifying this light as either a red light or not.  We subscribe to /base_waypoints, which contains all of the base waypoints, /camera/image_raw, which provides the current image taken by the camera on the vehicle, and /current_pose, which gives us the car’s current position.  
+Our approach to traffic light detection consisted of two parts: Detecting the traffic closest traffic light ahead, and then classifying this light as either a red light or not.  We subscribe to `/base_waypoints`, which contains all of the base waypoints, `/camera/image_raw`, which provides the current image taken by the camera on the vehicle, and `/current_pose`, which gives us the car’s current position.  
 
-To detect the closest traffic light, we utilized the config file provided by Udacity (sdc-capstone/ros/src/tl_detector/sim_traffic_light_config.yaml). We take generate the waypoints based on the current position of the car and generate the waypoints for the 8 traffic lights. Then, we loop through the traffic lights and find the closest one to the car’s waypoints. We also make sure to check that this traffic light is ahead of us, as we do not want to be checking the state of a traffic light that is behind us.
+To detect the closest traffic light, we utilized the config file provided by Udacity (`sdc-capstone/ros/src/tl_detector/sim_traffic_light_config.yaml`). We take generate the waypoints based on the current position of the car and generate the waypoints for the 8 traffic lights. Then, we loop through the traffic lights and find the closest one to the car’s waypoints. We also make sure to check that this traffic light is ahead of us, as we do not want to be checking the state of a traffic light that is behind us.
 
-The next step was to train a model to classify the image received from /camera/image_raw. We used a CNN-based model for classification. Below are the specs for this model:
+The next step was to train a model to classify the image received from `/camera/image_raw`. We used a CNN-based model for classification. Below are the specs for this model:
 
 
 
@@ -82,19 +82,20 @@ dropout_2 (Dropout)          (None, 128)               0
 _________________________________________________________________
 dense_2 (Dense)              (None, 2)                 258       
 _________________________________________________________________
-activation_9 (Activation)    (None, 2)                 0         
+activation_9 (Activation)    (None, 2)                 0  
+       
 =================================================================
-We trained our model on images taken from the simulator, which we manually labeled as “red” and “not red”. We also implemented code to zoom in on the image of the traffic light. This helped get rid of extraneous data in the images and allowed the classifier to focus on the traffic lights. We also applied image augmentation techniques to help our classifier adapt to a larger variety of images it may encounter. These techniques included flipping, zoom and shifting the images horizontally/vertically to create more data. This process can be found in /ros/src/tl_detector/train.py. 
+We trained our model on images taken from the simulator, which we manually labeled as “red” and “not red”. We also implemented code to zoom in on the image of the traffic light. This helped get rid of extraneous data in the images and allowed the classifier to focus on the traffic lights. We also applied image augmentation techniques to help our classifier adapt to a larger variety of images it may encounter. These techniques included flipping, zoom and shifting the images horizontally/vertically to create more data. This process can be found in `/ros/src/tl_detector/train.py`. 
 
-We eventually ended up with the model weights (/ros/src/tl_detector/model.h5) and were able to test our program to predict traffic lights.
+We eventually ended up with the model weights (`/ros/src/tl_detector/model.h5`) and were able to test our program to predict traffic lights.
 
-For the real-world Carla implementation we used the [Tensorflow Object Detection API] (https://github.com/tensorflow/models/tree/master/research/object_detection). We followed the guidance of Team Vulture's/John Chen nwork at https://github.com/diyjac/SDC-System-Integration/tree/master/classifier where they looked at different options. This was also recommended by Anthony Sarkis on Slack channel [Anthony Sarkis Medium blog](https://medium.com/@anthony_sarkis/self-driving-cars-implementing-real-time-traffic-light-detection-and-classification-in-2017-7d9ae8df1c58).
+For the real-world Carla implementation we used the [Tensorflow Object Detection API] (https://github.com/tensorflow/models/tree/master/research/object_detection). We followed the guidance of Team Vulture's/John Chen work on [GitHub](https://github.com/diyjac/SDC-System-Integration/tree/master/classifier) where they looked at different options. This was also recommended by Anthony Sarkis on Slack channel [Anthony Sarkis Medium blog](https://medium.com/@anthony_sarkis/self-driving-cars-implementing-real-time-traffic-light-detection-and-classification-in-2017-7d9ae8df1c58).
 
-We followed the instructions in John Chen's document Section 2.5 to download and extract the pre-trained model and weights from [Faster R-CNN with Resnet] (http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz), and leveraged the training data on just_traffic_light.bag rosbag data. 
+We followed the instructions in John Chen's document Section 2.5 to download and extract the pre-trained model and weights from [Faster R-CNN with Resnet] (http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz), and leveraged the training data on `just_traffic_light.bag` rosbag data. 
 
-After training was complete, we freeze the best checkpoint 1911 as the final model. We ran the scripts John Chen's team provided to verify the classification ofrosbag images.
+After training was complete, we freeze the best checkpoint 1911 as the final model. We ran the scripts John Chen's team provided to verify the classification of `rosbag` images.
 
-We toggle between the sim model and the real Carla model by setting ros parameter "model_type" to CNN for the launch files corresponding to sim (styx.launch) vs. the Carla model (site.launch).
+We toggle between the sim model and the real Carla model by setting ros parameter `model_type` to CNN for the launch files corresponding to sim (`styx.launch`) vs. the Carla model (`site.launch`).
 
 ## Drive-By-Wire (DBW)
 
