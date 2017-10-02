@@ -27,6 +27,8 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 LOOKAHEAD_WPS = 50 # 200 # Number of waypoints we will publish. You can change this number
 SLOW_DIST = 20. # (in meters) Distance from closest traffic light must be for car to start slowing down
 STOP_DIST = 4. # (in meters) Distance from closest traffic light to decide whether to top or go through intersection
+MAX_SPEED = 4.47# meters/second = 10 mph
+ACCEL = 0.05
 
 class WaypointUpdater(object):
 	def __init__(self):
@@ -119,7 +121,7 @@ class WaypointUpdater(object):
 		if no_red_light_detected:
 			# Set all waypoint velocities to MAX SPEED.
 			for wp in self.final_waypoints: 
-				self.set_waypoint_velocity(wp, 4.47) #Accelelerate to top speed
+				self.set_waypoint_velocity(wp, MAX_SPEED) #Accelelerate to top speed
 		        return
 
         # Otherwise, a red light was detected.
@@ -132,10 +134,21 @@ class WaypointUpdater(object):
 
 		# If we're within stopping distance, then set the future waypoints to 0 velocity to stop.
 		if dist <= STOP_DIST: 
-			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 0.0) #Decelerate to a stop
+			speed = self.current_velocity
+			decel = speed / dist
+			for wp in self.final_waypoints:
+				speed = max(0, speed - decel)
+				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
+
+			#for wp in self.final_waypoints:
+			#	if speed >= 0.0:
+			#	self.set_waypoint_velocity(wp, 0.0) #Decelerate to a stop
 		else: 
 			# Otherwise, keep going at top-speed.
-			for wp in self.final_waypoints: self.set_waypoint_velocity(wp, 4.47) #Accelelerate to top speed
+			speed = self.current_velocity
+			for wp in self.final_waypoints:
+				speed = min(MAX_SPEED, speed+ACCEL)
+				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
 	
 
 	""" Get the velocity at the specified waypoint index """
