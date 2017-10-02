@@ -27,8 +27,9 @@ To detect the closest traffic light, we utilized the config file provided by Uda
 The next step was to train a model to classify the image received from /camera/image_raw. We used a CNN-based model for classification. Below are the specs for this model:
 
 
-Layer (type)                 Output Shape              Param #   
 
+Layer (type)                 Output Shape              Param #   
+=================================================================
 conv2d_1 (Conv2D)            (None, 398, 398, 32)      896       
 _________________________________________________________________
 activation_1 (Activation)    (None, 398, 398, 32)      0         
