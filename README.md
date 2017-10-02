@@ -8,7 +8,7 @@
 * Apik Zorian - apikzorian@gmail.com
 
 ## Introduction
-@Apik
+For this project, our team designed a fully autonomous vehicle system, initially to be tested out on a simulator, and then on Udacity’s real self-driving car. The project can be broken up into three parts: (1) Traffic Light detection, (2)  Control, and (3) Waypoint Following. In Traffic Light Detection, we designed a detection node that would take the current waypoints of the car and an image taken from the car and determine if the closest traffic light was red or not. For Control, we designed a drive-by-wire (dbw) node that could take the target linear and angular velocities and publish commands for the throttle, brake, and steering of the car. Finally, the Waypoint Follower would take information from the traffic light detection and the current waypoints and update the target velocities for each waypoint based on this information. 
 
 ## Waypoint Updater
 Upon initialization, the Waypoint Updater will receive a copy of the base waypoints, and it will cache it internally.  
@@ -113,7 +113,8 @@ If the DBW flag becomes disabled (manual control), then all control values are r
 [Three Intermediate Traffic light Video](https://youtu.be/tenwII6HU1k)
 
 ## Conclusions
-@Apik
+This project was a great opportunity to collaborate with a team of students who had been through this nano-degree, while also putting together all of the knowledge we have compiled over the last 3 terms into one final project. By designating tasks among ourselves, we each tackled our area of expertise for the project and were always ready to help when we needed guidance or were stuck on a problem. Some areas of improvements would be increasing the amount of training data, improving the steering controls and motion planning, as well as better estimation of traffic lights for images. Overall, we are thrilled to have completed this course and are very thankful to Udacity for providing us with an opportunity to showcase our talents on a project that was both challenging and rewarding.
+
 
 
 ## Installation Details
