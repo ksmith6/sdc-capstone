@@ -86,9 +86,15 @@ activation_9 (Activation)    (None, 2)                 0
 =================================================================
 We trained our model on images taken from the simulator, which we manually labeled as “red” and “not red”. We also implemented code to zoom in on the image of the traffic light. This helped get rid of extraneous data in the images and allowed the classifier to focus on the traffic lights. We also applied image augmentation techniques to help our classifier adapt to a larger variety of images it may encounter. These techniques included flipping images and shifting the images horizontally/vertically to create more data. This process can be found in /ros/src/tl_detector/train.py. 
 
-We eventually ended up with the model weights (/ros/src/tl_detector/model.h5) and were able to test our program to predict traffic lights. For testing on real world model data, we followed 2.5 Tensorflow Model: Object Detection API of John Chen's work. https://github.com/diyjac/SDC-System-Integration/tree/master/classifier We use the best checkpoint 1911 as the finally model.
+We eventually ended up with the model weights (/ros/src/tl_detector/model.h5) and were able to test our program to predict traffic lights.
 
+For the real-world Carla implementation we used the [Tensorflow Object Detection API] (https://github.com/tensorflow/models/tree/master/research/object_detection). We followed the guidance of Team Vulture's/John Chen nwork at https://github.com/diyjac/SDC-System-Integration/tree/master/classifier where they looked at different options. This was also recommended by Anthony Sarkis on Slack channel [Anthony Sarkis Medium blog](https://medium.com/@anthony_sarkis/self-driving-cars-implementing-real-time-traffic-light-detection-and-classification-in-2017-7d9ae8df1c58).
 
+We followed the instructions in John Chen's document Section 2.5 to download and extract the pre-trained model and weights from [Faster R-CNN with Resnet] (http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz), and leveraged the training data on just_traffic_light.bag rosbag data. 
+
+After training was complete, we freeze the best checkpoint 1911 as the final model. We ran the scripts John Chen's team provided to verify the classification ofrosbag images.
+
+We toggle between the sim model and the real Carla model by setting ros parameter "model_type" to CNN for the launch files corresponding to sim (styx.launch) vs. the Carla model (site.launch).
 
 ## Drive-By-Wire (DBW)
 
@@ -101,6 +107,9 @@ If drive-by-wire (DBW) flag is enabled, then the `Controller` computed values fo
 The `Controller` logic resides within the `twist_controller.py` file.  This file leverages the `PID.py` file to control the throttle and brake commands.  Additionally, the steering commands are generated based on commands from `yaw_controller.py` and are smoothed via a low-pass filter from `lowpass.py` to remove jitter from the commanded steering angle.
 
 If the DBW flag becomes disabled (manual control), then all control values are reset.  This is critical for clearing out the running integral error term for a PID controller.
+
+## Partial Video of sim run
+[Three Intermediate Traffic light Video](https://youtu.be/tenwII6HU1k)
 
 ## Conclusions
 @Apik
