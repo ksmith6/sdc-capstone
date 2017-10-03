@@ -100,6 +100,16 @@ class DBWNode(object):
 		pass
 		self.final_waypoints = [[msg.waypoints[0].pose.pose.position.x,msg.waypoints[0].pose.pose.position.y],[msg.waypoints[5].pose.pose.position.x,msg.waypoints[5].pose.pose.position.y]]
 
+	"""
+	Primary Logic for drive-by-wire node.
+
+	This logic will call the Controller object with the current state information (speed, etc) to obtain throttle, brake, and steering commands.
+
+	If DBW is enabled, then the values for throttle, braking, and steering are published.
+
+	If DBW becomes disabled, then all values are reset.
+
+	"""
 	def loop(self):
 		rate = rospy.Rate(5) #Was originally set to 50Hz
 		while not rospy.is_shutdown():
@@ -115,9 +125,10 @@ class DBWNode(object):
 				#if throttle > 0.0 or (self.decel < self.brake_deadband and self.current_linear > 0.5): brake = 0.0
 				else: brake = self.brake_max_torque*brake
 				
-				#rospy.logwarn('linear: %s, current: %s', self.linear_velocity, self.current_linear)
-				#rospy.logwarn('angular: %s, decel: %s, time: %s', self.angular_velocity, self.decel, self.previous_time)
-				#rospy.logwarn('throttle: %s, brake: %s, steer: %s', throttle, brake, steer)
+				rospy.loginfo('linear: %s, current: %s', self.linear_velocity, self.current_linear)
+				rospy.loginfo('angular: %s, decel: %s, time: %s', self.angular_velocity, self.decel, self.previous_time)
+				rospy.loginfo('throttle: %s, brake: %s, steer: %s', throttle, brake, steer)
+
 				self.publish(throttle, brake, steer)
 			else: self.reset()
 			rate.sleep()
