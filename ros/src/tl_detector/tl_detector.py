@@ -95,7 +95,7 @@ class TLDetector(object):
 
 		light_wp, state = self.process_traffic_lights()
 		if state == TrafficLight.UNKNOWN:
-			state_str = 'Unknown'
+			state_str = 'Green/Yellow'
 		else:
 			state_str = 'Red'
 
