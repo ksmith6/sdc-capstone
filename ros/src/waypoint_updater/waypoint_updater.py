@@ -7,6 +7,7 @@ from std_msgs.msg import Int32
 
 import math
 import tf
+from copy import deepcopy
 from scipy.interpolate import CubicSpline
 
 '''
@@ -27,8 +28,8 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 LOOKAHEAD_WPS = 50 # 200 # Number of waypoints we will publish. You can change this number
 
 STOP_DIST = 4. # (in meters) Distance from closest traffic light to decide whether to top or go through intersection
-MAX_SPEED = 2.77# meters/second = 10 kph
-SLOW_DIST = MAX_SPEED*4 # (in meters) Distance from closest traffic light must be for car to start slowing down
+#MAX_SPEED = 2.77# meters/second = 10 kph
+#SLOW_DIST = self.max_speed*4 # (in meters) Distance from closest traffic light must be for car to start slowing down
 ACCEL = 1.0 # Velocity increment (m/s) to be applied at each waypoint 
 
 
@@ -40,11 +41,12 @@ class WaypointUpdater(object):
 		self.current_pose = None
 		self.next_waypoint_index = None
 		self.light_wp = None
-		
+		self.max_speed = None
+		self.slow_dist = None
 
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
-		#rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
-		self.base_waypoints = rospy.wait_for_message('/base_waypoints', Lane).waypoints #Only need to get base_waypoints once
+		self.wp_sub = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
+		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
 		rospy.Subscriber('/current_velocity', TwistStamped, callback=self.current_velocity_cb, queue_size=1)
 		rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb, queue_size=1)
 
@@ -58,6 +60,11 @@ class WaypointUpdater(object):
 	
 	def waypoints_cb(self, waypoints):
 		self.base_waypoints = waypoints.waypoints
+		if self.base_waypoints:
+			self.wp_sub.unregister()
+			self.wp_sub = None
+			self.max_speed = self.get_waypoint_velocity(self.base_waypoints[0]) #Get velocity from waypoint_loader
+			self.slow_dist = self.max_speed*4
 
 	def current_velocity_cb(self, msg):
 		self.current_velocity = msg.twist.linear.x
@@ -110,12 +117,12 @@ class WaypointUpdater(object):
 	""" Get the next LOOKAHEAD_WPS waypoints """
 	def set_final_waypoints(self):
 		# Grab the next LOOKAHEAD_WPS waypoints from the base waypoints.
-		self.final_waypoints = self.base_waypoints[self.next_waypoint_index: self.next_waypoint_index + LOOKAHEAD_WPS]
+		self.final_waypoints = deepcopy(self.base_waypoints[self.next_waypoint_index: self.next_waypoint_index + LOOKAHEAD_WPS])
 
 		# If wraparound occurs, handle it by grabbing waypoints from beginning of base waypoints. 
 		rem_points = LOOKAHEAD_WPS - len(self.final_waypoints)
 		if rem_points > 0: 
-			self.final_waypoints = self.final_waypoints + self.base_waypoints[0:rem_points]
+			if rem_points > 0: self.final_waypoints = self.final_waypoints + deepcopy(self.base_waypoints[0:rem_points])
 	
 	""" Set the waypoint speeds based on traffic light information """
 	def set_final_waypoints_speed(self):
@@ -128,16 +135,16 @@ class WaypointUpdater(object):
 			rospy.logwarn("Upcoming TL waypoint %d" % -self.light_wp)
 			# Set all waypoint velocities to MAX SPEED.
 			#for wp in self.final_waypoints: 
-			#	self.set_waypoint_velocity(wp, MAX_SPEED) #Accelelerate to top speed
+			#	self.set_waypoint_velocity(wp, self.max_speed) #Accelelerate to top speed
 		    #    return
 			speed = self.current_velocity
 
-			target_speed = MAX_SPEED
+			target_speed = self.max_speed
 
 			# Creep up on the target mode...  Unfortunately, it causes us to creep once the light turns green too since we haven't yet passed the light.
 			Creep_Enabled = False
-			if Creep_Enabled and dist < SLOW_DIST:
- 				target_speed = MAX_SPEED / 2.0
+			if Creep_Enabled and dist < self.slow_dist:
+ 				target_speed = self.max_speed / 2.0
 			
 
 			for wp in self.final_waypoints:
@@ -156,8 +163,9 @@ class WaypointUpdater(object):
 		# Report message of upcoming traffic light.
 		rospy.logwarn("Next wp: %s, Next TL wp: %s, distance: %s",self.next_waypoint_index, self.light_wp, dist)
 
+
 		# If we're within stopping distance, then set the future waypoints to 0 velocity to stop.
-		if dist <= SLOW_DIST: 
+		if dist <= self.slow_dist: 
 			speed = self.current_velocity
 			decel = speed / (dist - STOP_DIST)
 			rospy.logwarn("Decelerating to stop light with : %f",decel)
@@ -171,13 +179,13 @@ class WaypointUpdater(object):
 		else: 
 			# Otherwise, keep going at top-speed.
 			speed = self.current_velocity
-			if speed < MAX_SPEED:
+			if speed < self.max_speed:
 				rospy.logwarn("Accelerating to top speed again...")
 			for wp in self.final_waypoints:
-				if speed > MAX_SPEED:				
-					speed = min(MAX_SPEED, speed+ACCEL)
+				if speed > self.max_speed:				
+					speed = min(self.max_speed, speed+ACCEL)
 				else:
-					speed = max(MAX_SPEED, speed-ACCEL)
+					speed = max(self.max_speed, speed-ACCEL)
 				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
 	
 
