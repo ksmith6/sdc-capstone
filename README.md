@@ -115,7 +115,10 @@ If the DBW flag becomes disabled (manual control), then all control values are r
 ## Conclusions
 This project was a great opportunity to collaborate with a team of students who had been through this nano-degree, while also putting together all of the knowledge we have compiled over the last 3 terms into one final project. By designating tasks among ourselves, we each tackled our area of expertise for the project and were always ready to help when we needed guidance or were stuck on a problem. Some areas of improvements would be increasing the amount of training data, improving the steering controls and motion planning, as well as better estimation of traffic lights for images. Overall, we are thrilled to have completed this course and are very thankful to Udacity for providing us with an opportunity to showcase our talents on a project that was both challenging and rewarding.
 
-
+## Acknowledgments
+We would like to thank all those individuals that have provided very useful tips and information in the project Slack Channel. In particular:
+- John Chen for all the generous information that he has provided online; and 
+- Alexey Makurin for the Github link he provided [lag fixes](https://github.com/amakurin/CarND-Capstone/commit/9809bc60d51c06174f8c8bfe6c40c88ec1c39d50) offering suggestions on how to fix lag issues in the simulator. Many of these suggestions were applied in the code.
 
 ## Installation Details
 
