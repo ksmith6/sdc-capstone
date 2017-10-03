@@ -38,6 +38,7 @@ class WaypointUpdater(object):
 		self.current_pose = None
 		self.next_waypoint_index = None
 		self.light_wp = None
+		
 
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size=1)
 		#rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size=1)
@@ -78,7 +79,7 @@ class WaypointUpdater(object):
 			# If we're initialized
 			if is_initialized: # and self.current_velocity:
 
-				# Get the index of hte closest waypoint.	
+				# Get the index of the closest waypoint.	
 				start_idx = self.closest_waypoint(self.current_pose.position)
 
 				# If this waypoint is behind the current pose then update to next waypoint
@@ -116,28 +117,39 @@ class WaypointUpdater(object):
 	
 	""" Set the waypoint speeds based on traffic light information """
 	def set_final_waypoints_speed(self):
+		
+		# Get the distance between the next waypoint and the traffic light.
+		dist = self.distance(self.base_waypoints, self.next_waypoint_index, abs(self.light_wp))
 
 		no_red_light_detected = self.light_wp < 0
 		if no_red_light_detected:
+			rospy.logwarn("Upcoming TL waypoint %d" % -self.light_wp)
 			# Set all waypoint velocities to MAX SPEED.
 			#for wp in self.final_waypoints: 
 			#	self.set_waypoint_velocity(wp, MAX_SPEED) #Accelelerate to top speed
 		    #    return
 			speed = self.current_velocity
 
+			target_speed = MAX_SPEED
+
+			# Creep up on the target mode...  Unfortunately, it causes us to creep once the light turns green too since we haven't yet passed the light.
+			Creep_Enabled = False
+			if Creep_Enabled and dist < SLOW_DIST:
+ 				target_speed = MAX_SPEED / 2.0
+			
+
 			for wp in self.final_waypoints:
-				if speed > MAX_SPEED:				
-					speed = min(MAX_SPEED, speed+ACCEL)
+				if speed > target_speed:				
+					speed = min(target_speed, speed+ACCEL)
 				else:
-					speed = max(MAX_SPEED, speed-ACCEL)
+					speed = max(target_speed, speed-ACCEL)
 				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
 			
 			return
 
         # Otherwise, a red light was detected.
 
-        # Get the distance between the next waypoint and the traffic light.
-		dist = self.distance(self.base_waypoints, self.next_waypoint_index, self.light_wp)
+        
 
 		# Report message of upcoming traffic light.
 		rospy.logwarn("Next wp: %s, Next TL wp: %s, distance: %s",self.next_waypoint_index, self.light_wp, dist)
