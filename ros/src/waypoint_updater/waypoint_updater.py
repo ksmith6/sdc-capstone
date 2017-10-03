@@ -122,7 +122,7 @@ class WaypointUpdater(object):
 		# If wraparound occurs, handle it by grabbing waypoints from beginning of base waypoints. 
 		rem_points = LOOKAHEAD_WPS - len(self.final_waypoints)
 		if rem_points > 0: 
-			if rem_points > 0: self.final_waypoints = self.final_waypoints + deepcopy(self.base_waypoints[0:rem_points])
+			self.final_waypoints = self.final_waypoints + deepcopy(self.base_waypoints[0:rem_points])
 	
 	""" Set the waypoint speeds based on traffic light information """
 	def set_final_waypoints_speed(self):
