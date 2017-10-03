@@ -90,8 +90,16 @@ class TLDetector(object):
 		self.has_image = True
 		self.camera_image = msg
 		if not self.lights or not self.waypoints or not self.pose: pass
+
+
+
 		light_wp, state = self.process_traffic_lights()
-                rospy.logwarn("Light wp: %s,  Light state %s",light_wp, state)
+		if state == TrafficLight.UNKNOWN:
+			state_str = 'Unknown'
+		else:
+			state_str = 'Red'
+
+		rospy.logwarn("Light wp: %s,  Light state: %s",light_wp, state_str)
 
 		'''
 		Publish upcoming red lights at camera frequency.
@@ -99,10 +107,13 @@ class TLDetector(object):
 		of times till we start using it. Otherwise the previous stable state is
 		used.
 		'''
+		# Does the detected state not match the previous state?
 		if self.state != state:
+			# Yes - they're different.  Reset the counter.
 			self.state_count = 0
 			self.state = state
 		elif self.state_count >= STATE_COUNT_THRESHOLD:
+			# Elseif the state count is above the persistence threshold
 			self.last_state = self.state
 			light_wp = light_wp if state == TrafficLight.RED else -1
 			self.last_wp = light_wp
