@@ -26,8 +26,8 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 
 LOOKAHEAD_WPS = 50 # 200 # Number of waypoints we will publish. You can change this number
 STOP_DIST = 4. # (in meters) Distance from closest traffic light to decide whether to top or go through intersection
-MAX_SPEED = 4.47# meters/second = 10 mph
-SLOW_DIST = MAX_SPEED*2 # (in meters) Distance from closest traffic light must be for car to start slowing down
+MAX_SPEED = 2.77# meters/second = 10 kph
+SLOW_DIST = MAX_SPEED*4 # (in meters) Distance from closest traffic light must be for car to start slowing down
 ACCEL = 1.0 # Velocity increment (m/s) to be applied at each waypoint 
 
 class WaypointUpdater(object):
@@ -125,9 +125,6 @@ class WaypointUpdater(object):
 		    #    return
 			speed = self.current_velocity
 
-			if speed < MAX_SPEED:
-				rospy.loginfo("Cruising...")
-			
 			for wp in self.final_waypoints:
 				if speed > MAX_SPEED:				
 					speed = min(MAX_SPEED, speed+ACCEL)
@@ -148,7 +145,7 @@ class WaypointUpdater(object):
 		# If we're within stopping distance, then set the future waypoints to 0 velocity to stop.
 		if dist <= SLOW_DIST: 
 			speed = self.current_velocity
-			decel = speed / dist
+			decel = speed / (dist + STOP_DIST)
 			rospy.logwarn("Decelerating to stop light with : %f",decel)
 			for wp in self.final_waypoints:
 				speed = max(0, speed - decel)
