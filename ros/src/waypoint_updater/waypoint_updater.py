@@ -126,10 +126,13 @@ class WaypointUpdater(object):
 			speed = self.current_velocity
 
 			if speed < MAX_SPEED:
-				rospy.loginfo("Accelerating to top speed again...")
+				rospy.loginfo("Cruising...")
 			
 			for wp in self.final_waypoints:
-				speed = min(MAX_SPEED, speed+ACCEL)
+				if speed > MAX_SPEED:				
+					speed = min(MAX_SPEED, speed+ACCEL)
+				else:
+					speed = max(MAX_SPEED, speed-ACCEL)
 				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
 			
 			return
@@ -146,7 +149,7 @@ class WaypointUpdater(object):
 		if dist <= SLOW_DIST: 
 			speed = self.current_velocity
 			decel = speed / dist
-			rospy.loginfo("Decelerating to stop light with : %f",decel)
+			rospy.logwarn("Decelerating to stop light with : %f",decel)
 			for wp in self.final_waypoints:
 				speed = max(0, speed - decel)
 				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
@@ -158,7 +161,7 @@ class WaypointUpdater(object):
 			# Otherwise, keep going at top-speed.
 			speed = self.current_velocity
 			if speed < MAX_SPEED:
-				rospy.loginfo("Accelerating to top speed again...")
+				rospy.logwarn("Accelerating to top speed again...")
 			for wp in self.final_waypoints:
 				speed = min(MAX_SPEED, speed+ACCEL)
 				self.set_waypoint_velocity(wp, speed) #Accelelerate to top speed
