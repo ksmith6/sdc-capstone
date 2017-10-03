@@ -15,9 +15,11 @@ Upon initialization, the Waypoint Updater will receive a copy of the base waypoi
 
 At each 5Hz cycle of the waypoint updater code, it publishes the final waypoints (50) and their speeds to the `/final_waypoints` topic.
 
-The speed at each waypoint is determined by whether or not a red light has been detected or not.  If a red light has been detected and the vehicle is within the braking distance (4 meters), then it will set all waypoint velocities to zero to stop the vehicle.
+If no red light has been detected by the traffic light detection algorithm, then the waypoint updater will command a constant acceleration or deceleration to return to the maximum speed.
 
-If no red traffic light has been detected, then the waypoint updater will command all final waypoints to drive at the maximum speed (10 mph). 
+However, if a red light has been detected and if the distance to the upcoming red light is less than some slowdown threshold distance, then the waypoint updater will linearly decelerate all the the upcoming waypoints towards zero at some offset distance prior to the actual intersection.  This offset distance was found to be useful to improve the traffic light classifier performance.  
+
+If a red light has been detected but the vehicle is beyond the slowdown threshold distance, then the waypoint updater will command the vehicle to linearly accelerate or decelerate to the maximum speed.
 
 ## Traffic Light Detection
 Our approach to traffic light detection consisted of two parts: Detecting the traffic closest traffic light ahead, and then classifying this light as either a red light or not.  We subscribe to `/base_waypoints`, which contains all of the base waypoints, `/camera/image_raw`, which provides the current image taken by the camera on the vehicle, and `/current_pose`, which gives us the car’s current position.  
