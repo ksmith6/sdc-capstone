@@ -107,7 +107,7 @@ If drive-by-wire (DBW) flag is enabled, then the `Controller` computed values fo
 
 The `Controller` logic resides within the `twist_controller.py` file.  This file leverages the `PID.py` file to control the throttle and brake commands.  Additionally, the steering commands are generated based on commands from `yaw_controller.py` and are smoothed via a low-pass filter from `lowpass.py` to remove jitter from the commanded steering angle.
 
-If the DBW flag becomes disabled (manual control), then all control values are reset.  This is critical for clearing out the running integral error term for a PID controller.
+If the DBW flag becomes disabled (manual control), then all control values are reset.  
 
 ## Partial Video of sim run
 [Three Intermediate Traffic light Video](https://youtu.be/tenwII6HU1k)
