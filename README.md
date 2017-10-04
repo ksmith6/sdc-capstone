@@ -95,7 +95,7 @@ For the real-world Carla implementation we used the [Tensorflow Object Detection
 
 We followed the instructions in John Chen's document Section 2.5 to download and extract the pre-trained model and weights from [Faster R-CNN with Resnet] (http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz), and leveraged the training data on `just_traffic_light.bag` rosbag data. 
 
-After training was complete, we freeze the best checkpoint 1911 as the final model. We ran the scripts John Chen's team provided to verify the classification of `rosbag` images.
+After training was complete, we freeze the best checkpoint 1911 as the final model. Our model can be downloaded from https://drive.google.com/open?id=0B8PSf2JS7ts2VDNSWmI1MVZRSDQ. We ran the scripts John Chen's team provided to verify the classification of `rosbag` images.
 
 We toggle between the sim model and the real Carla model by setting ros parameter `model_type` to CNN for the launch files corresponding to sim (`styx.launch`) vs. the Carla model (`site.launch`).
 
