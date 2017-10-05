@@ -14,7 +14,7 @@ class TLClassifier(object):
 	r = rospkg.RosPack()
 	path = r.get_path('tl_detector')
 	print(path)
-        self.model = load_model(path + '/model3.h5') 
+        self.model = load_model(path + '/test_1.h5') 
 
 	self.model._make_predict_function()
         self.graph = tf.get_default_graph()
