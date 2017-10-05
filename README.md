@@ -2,8 +2,8 @@
 
 ### Team Members:
 * Jean-Paul Haddad - jeanpaul.haddad@gmail.com
-* Shaobo Luo - shaobo.luo@gmail.com
-* Babi Seal - sourav.seal@gmail.com
+* Shaobo Luo - luos@u.nus.edu
+* Sourav Seal - sourav.seal@gmail.com
 * Kelly Smith - kellymichaelsmith@gmail.com
 * Apik Zorian - apikzorian@gmail.com
 
@@ -91,11 +91,12 @@ We trained our model on images taken from the simulator, which we manually label
 
 We eventually ended up with the model weights (`/ros/src/tl_detector/test_1.h5`) and were able to test our program to predict traffic lights.
 
+
 For the real-world Carla implementation we used the [Tensorflow Object Detection API] (https://github.com/tensorflow/models/tree/master/research/object_detection). We followed the guidance of Team Vulture's/John Chen work on [GitHub](https://github.com/diyjac/SDC-System-Integration/tree/master/classifier) where they looked at different options. This was also recommended by Anthony Sarkis on Slack channel [Anthony Sarkis Medium blog](https://medium.com/@anthony_sarkis/self-driving-cars-implementing-real-time-traffic-light-detection-and-classification-in-2017-7d9ae8df1c58).
 
 We followed the instructions in John Chen's document Section 2.5 to download and extract the pre-trained model and weights from [Faster R-CNN with Resnet] (http://download.tensorflow.org/models/object_detection/faster_rcnn_resnet101_coco_11_06_2017.tar.gz), and leveraged the training data on `just_traffic_light.bag` rosbag data. 
 
-After training was complete, we freeze the best checkpoint 1911 as the final model. We ran the scripts John Chen's team provided to verify the classification of `rosbag` images.
+After training was complete, we freeze the best checkpoint 1911 as the final model. Our model can be downloaded from https://drive.google.com/open?id=0B8PSf2JS7ts2VDNSWmI1MVZRSDQ. We ran the scripts John Chen's team provided to verify the classification of `rosbag` images.
 
 We toggle between the sim model and the real Carla model by setting ros parameter `model_type` to CNN for the launch files corresponding to sim (`styx.launch`) vs. the Carla model (`site.launch`).
 
@@ -110,9 +111,6 @@ If drive-by-wire (DBW) flag is enabled, then the `Controller` computed values fo
 The `Controller` logic resides within the `twist_controller.py` file.  This file leverages the `PID.py` file to control the throttle and brake commands.  Additionally, the steering commands are generated based on commands from `yaw_controller.py` and are smoothed via a low-pass filter from `lowpass.py` to remove jitter from the commanded steering angle.
 
 If the DBW flag becomes disabled (manual control), then all control values are reset.  
-
-## Partial Video of sim run
-[Three Intermediate Traffic light Video](https://youtu.be/tenwII6HU1k)
 
 ## Conclusions
 This project was a great opportunity to collaborate with a team of students who had been through this nano-degree, while also putting together all of the knowledge we have compiled over the last 3 terms into one final project. By designating tasks among ourselves, we each tackled our area of expertise for the project and were always ready to help when we needed guidance or were stuck on a problem. Some areas of improvements would be increasing the amount of training data, improving the steering controls and motion planning, as well as better estimation of traffic lights for images. Overall, we are thrilled to have completed this course and are very thankful to Udacity for providing us with an opportunity to showcase our talents on a project that was both challenging and rewarding.
