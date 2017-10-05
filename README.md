@@ -163,16 +163,13 @@ roslaunch launch/styx.launch
 4. Run the simulator
 
 ### Real world testing
-1. Download [training bag](https://drive.google.com/file/d/0B2_h37bMVw3iYkdJTlRSUlJIamM/view?usp=sharing) that was recorded on the Udacity self-driving car
-2. Unzip the file
-```bash
-unzip traffic_light_bag_files.zip
+1. Because of the size constraints of github < 100MB we are not able to 
+upload our trained tensorflow model for Object Detection. Please download our trained model [frozen_inference_graph.pb] (https://drive.google.com/uc?id=0B8PSf2JS7ts2VDNSWmI1MVZRSDQ) from Google Drive.
+
+2. Please place downloaded file in the tl_detector ros directory (sdc-capstone/ros/src/tl_detector).
+
 ```
-3. Play the bag file
-```bash
-rosbag play -l traffic_light_bag_files/loop_with_traffic_light.bag
-```
-4. Launch your project in site mode
+3. Launch project in site mode
 ```bash
 cd CarND-Capstone/ros
 roslaunch launch/site.launch
