@@ -8,16 +8,18 @@
 * Apik Zorian - apikzorian@gmail.com
 
 ## Introduction
-@Apik
+For this project, our team designed a fully autonomous vehicle system, initially to be tested out on a simulator, and then on Udacity’s real self-driving car. The project can be broken up into three parts: (1) Traffic Light detection, (2)  Control, and (3) Waypoint Following. In Traffic Light Detection, we designed a detection node that would take the current waypoints of the car and an image taken from the car and determine if the closest traffic light was red or not. For Control, we designed a drive-by-wire (dbw) node that could take the target linear and angular velocities and publish commands for the throttle, brake, and steering of the car. Finally, the Waypoint Follower would take information from the traffic light detection and the current waypoints and update the target velocities for each waypoint based on this information. 
 
 ## Waypoint Updater
 Upon initialization, the Waypoint Updater will receive a copy of the base waypoints, and it will cache it internally.  
 
 At each 5Hz cycle of the waypoint updater code, it publishes the final waypoints (50) and their speeds to the `/final_waypoints` topic.
 
-The speed at each waypoint is determined by whether or not a red light has been detected or not.  If a red light has been detected and the vehicle is within the braking distance (4 meters), then it will set all waypoint velocities to zero to stop the vehicle.
+If no red light has been detected by the traffic light detection algorithm, then the waypoint updater will command a constant acceleration or deceleration to return to the prescribed maximum speed.
 
-If no red traffic light has been detected, then the waypoint updater will command all final waypoints to drive at the maximum speed (10 mph). 
+However, if a red light has been detected and if the distance to the upcoming red light is less than some slowdown threshold distance, then the waypoint updater will linearly decelerate all the the upcoming waypoints towards zero at some offset distance prior to the actual intersection.  If the vehicle is less than this offset distance, then it will completely stop and wait at the traffic light.  Extra logic is also provided to help the vehicle approach the traffic light slowly if it is currently stopped (speed=0) within the slowdown zone.  In this case, it will slowly approach the intersection before stopping.   
+
+If a red light has been detected but the vehicle is beyond the slowdown threshold distance, then the waypoint updater will command the vehicle to linearly accelerate or decelerate to the maximum speed.
 
 ## Traffic Light Detection
 Our approach to traffic light detection consisted of two parts: Detecting the traffic closest traffic light ahead, and then classifying this light as either a red light or not.  We subscribe to `/base_waypoints`, which contains all of the base waypoints, `/camera/image_raw`, which provides the current image taken by the camera on the vehicle, and `/current_pose`, which gives us the car’s current position.  
@@ -107,14 +109,18 @@ If drive-by-wire (DBW) flag is enabled, then the `Controller` computed values fo
 
 The `Controller` logic resides within the `twist_controller.py` file.  This file leverages the `PID.py` file to control the throttle and brake commands.  Additionally, the steering commands are generated based on commands from `yaw_controller.py` and are smoothed via a low-pass filter from `lowpass.py` to remove jitter from the commanded steering angle.
 
-If the DBW flag becomes disabled (manual control), then all control values are reset.  This is critical for clearing out the running integral error term for a PID controller.
+If the DBW flag becomes disabled (manual control), then all control values are reset.  
 
 ## Partial Video of sim run
 [Three Intermediate Traffic light Video](https://youtu.be/tenwII6HU1k)
 
 ## Conclusions
-@Apik
+This project was a great opportunity to collaborate with a team of students who had been through this nano-degree, while also putting together all of the knowledge we have compiled over the last 3 terms into one final project. By designating tasks among ourselves, we each tackled our area of expertise for the project and were always ready to help when we needed guidance or were stuck on a problem. Some areas of improvements would be increasing the amount of training data, improving the steering controls and motion planning, as well as better estimation of traffic lights for images. Overall, we are thrilled to have completed this course and are very thankful to Udacity for providing us with an opportunity to showcase our talents on a project that was both challenging and rewarding.
 
+## Acknowledgments
+We would like to thank all those individuals that have provided very useful tips and information on the project Slack Channel. In particular:
+- John Chen for all the generous information that he has provided online; and 
+- Alexey Makurin for the Github link he provided [lag fixes](https://github.com/amakurin/CarND-Capstone/commit/9809bc60d51c06174f8c8bfe6c40c88ec1c39d50) offering suggestions on how to fix lag issues in the simulator. Many of these suggestions were applied in the code.
 
 ## Installation Details
 

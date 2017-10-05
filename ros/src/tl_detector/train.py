@@ -11,7 +11,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Input, Activation
 
 img_width, img_height = 400, 400
-path ='/home/luos/uda/tflight/'
+#path ='/home/luos/uda/tflight/'
+path='/home/ksmith/Documents/Udacity/sdc-capstone/redlighttest/'
 train_data_dir = path +"img"
 validation_data_dir =  path +"img"
 nb_train_samples = 1233
