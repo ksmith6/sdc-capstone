@@ -89,7 +89,7 @@ activation_9 (Activation)    (None, 2)                 0
 =================================================================
 We trained our model on images taken from the simulator, which we manually labeled as “red” and “not red”. We also implemented code to zoom in on the image of the traffic light. This helped get rid of extraneous data in the images and allowed the classifier to focus on the traffic lights. We also applied image augmentation techniques to help our classifier adapt to a larger variety of images it may encounter. These techniques included flipping, zoom and shifting the images horizontally/vertically to create more data. This process can be found in `/ros/src/tl_detector/train.py`. 
 
-We eventually ended up with the model weights (`/ros/src/tl_detector/model.h5`) and were able to test our program to predict traffic lights.
+We eventually ended up with the model weights (`/ros/src/tl_detector/test_1.h5`) and were able to test our program to predict traffic lights.
 
 For the real-world Carla implementation we used the [Tensorflow Object Detection API] (https://github.com/tensorflow/models/tree/master/research/object_detection). We followed the guidance of Team Vulture's/John Chen work on [GitHub](https://github.com/diyjac/SDC-System-Integration/tree/master/classifier) where they looked at different options. This was also recommended by Anthony Sarkis on Slack channel [Anthony Sarkis Medium blog](https://medium.com/@anthony_sarkis/self-driving-cars-implementing-real-time-traffic-light-detection-and-classification-in-2017-7d9ae8df1c58).
 
